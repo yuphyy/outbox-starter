@@ -1,3 +1,5 @@
 yuphy.outbox.starter.autoconfigure.OutboxAutoConfiguration
+yuphy.outbox.starter.autoconfigure.OutboxDataSourceAutoConfiguration
+yuphy.outbox.starter.autoconfigure.OutboxJpaAutoConfiguration
 yuphy.outbox.starter.autoconfigure.OutboxKafkaAutoConfiguration
 yuphy.outbox.starter.autoconfigure.OutboxPublisherAutoConfiguration

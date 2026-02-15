@@ -13,16 +13,21 @@
 ### База данных (PostgreSQL)
 
 ```yaml
-spring:
+outbox:
   datasource:
     url: jdbc:postgresql://localhost:5432/outbox
     username: outbox
     password: outbox
+
+spring:
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
 ```
+
+Outbox использует собственный `outbox.datasource.*`. Можно дублировать настройки вашего основного `spring.datasource.*` — это явно показывает, куда пишет outbox.
+Если `outbox.datasource.url` не задан, outbox будет использовать основной datasource приложения.
 
 ### Kafka (outbox, plaintext, локально)
 
@@ -79,7 +84,7 @@ outboxClient.enqueue("order-123", "{\"event\":\"ORDER_CREATED\"}");
 - `model`: сущности и статус (`OutboxMessage`, `OutboxMessageStatus`).
 - `repository`: JPA-репозиторий.
 - `publisher`: выборка и отправка (`OutboxBatchReader`, `OutboxSender`, `OutboxPublisher`).
-- `config`: свойства (`OutboxProperties`, `OutboxKafkaProperties`).
+- `config`: свойства (`OutboxProperties`, `OutboxKafkaProperties`, `OutboxDataSourceProperties`).
 - `autoconfigure`: автоконфигурация Spring Boot.
 
 ## Миграции БД (Liquibase)

@@ -10,9 +10,16 @@ import jakarta.persistence.Version;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @Table(name = "outbox_message")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OutboxMessage {
 
     @Id
@@ -41,20 +48,6 @@ public class OutboxMessage {
     @Version
     private long version;
 
-    protected OutboxMessage() {
-    }
-
-    private OutboxMessage(UUID id, String topic, String messageKey, String payload, OutboxMessageStatus status,
-                          Instant createdAt, Instant sentAt) {
-        this.id = id;
-        this.topic = topic;
-        this.messageKey = messageKey;
-        this.payload = payload;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.sentAt = sentAt;
-    }
-
     public static OutboxMessage pending(String topic, String messageKey, String payload, Clock clock) {
         return new OutboxMessage(
                 UUID.randomUUID(),
@@ -63,40 +56,13 @@ public class OutboxMessage {
                 payload,
                 OutboxMessageStatus.PENDING,
                 Instant.now(clock),
-                null
+                null,
+                0L
         );
     }
 
     public void markSent(Clock clock) {
         this.status = OutboxMessageStatus.SENT;
         this.sentAt = Instant.now(clock);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public String getMessageKey() {
-        return messageKey;
-    }
-
-    public String getPayload() {
-        return payload;
-    }
-
-    public OutboxMessageStatus getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getSentAt() {
-        return sentAt;
     }
 }

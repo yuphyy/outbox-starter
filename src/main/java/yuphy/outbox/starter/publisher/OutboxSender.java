@@ -1,22 +1,19 @@
 package yuphy.outbox.starter.publisher;
 
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import yuphy.outbox.starter.model.OutboxMessage;
 
+@RequiredArgsConstructor
 public class OutboxSender {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxSender.class);
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final long sendTimeoutMs;
-
-    public OutboxSender(KafkaTemplate<String, String> kafkaTemplate, long sendTimeoutMs) {
-        this.kafkaTemplate = kafkaTemplate;
-        this.sendTimeoutMs = sendTimeoutMs;
-    }
 
     public boolean send(OutboxMessage message) {
         try {
