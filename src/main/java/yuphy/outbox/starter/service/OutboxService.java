@@ -5,7 +5,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import yuphy.outbox.starter.api.OutboxClient;
-import yuphy.outbox.starter.config.OutboxProperties;
 import yuphy.outbox.starter.model.OutboxMessage;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
@@ -13,14 +12,24 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 public class OutboxService implements OutboxClient {
 
     private final OutboxMessageRepository repository;
-    private final OutboxProperties properties;
+    private final OutboxRouteResolver routeResolver;
     private final Clock clock;
 
     @Transactional("outboxTransactionManager")
     @Override
-    public UUID enqueue(String messageKey, String payload) {
-        OutboxMessage message = OutboxMessage.pending(properties.getTopic(), messageKey, payload, clock);
+    public UUID enqueue(String messageType, String recipient, String messageKey, String payload) {
+        String safeType = requireText(messageType, "messageType");
+        String safeRecipient = requireText(recipient, "recipient");
+        String topic = routeResolver.resolveTopic(safeType, safeRecipient);
+        OutboxMessage message = OutboxMessage.pending(topic, safeType, safeRecipient, messageKey, payload, clock);
         repository.save(message);
         return message.getId();
+    }
+
+    private static String requireText(String value, String name) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(name + " is required");
+        }
+        return value;
     }
 }

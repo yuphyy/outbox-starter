@@ -34,17 +34,20 @@ Outbox использует собственный `outbox.datasource.*`. Мож
 ```yaml
 outbox:
   kafka:
+    enabled: true
     bootstrap-servers: localhost:9092
     security-protocol: PLAINTEXT
 ```
 
 Outbox использует собственный набор настроек `outbox.kafka.*` и не конфликтует с `spring.kafka.*` вашего сервиса.
+Если `outbox.kafka.enabled=false`, Kafka-часть полностью выключена и остальные поля можно не заполнять.
 
 ### Kafka (outbox, SSL с keystore/truststore)
 
 ```yaml
 outbox:
   kafka:
+    enabled: true
     bootstrap-servers: kafka.prod:9093
     security-protocol: SSL
     ssl:
@@ -61,7 +64,11 @@ outbox:
 
 ```yaml
 outbox:
-  topic: outbox.events
+  routes:
+    ORDER_CREATED:
+      recipients:
+        billing: outbox.billing
+        shipping: outbox.shipping
   publisher:
     enabled: true
     batch-size: 100
@@ -69,12 +76,14 @@ outbox:
     send-timeout-ms: 5000
 ```
 
+Если маршрут для пары (`messageType`, `recipient`) не найден, `enqueue` выбросит `IllegalArgumentException`.
+
 ## Как пользоваться
 
-Инжектируйте `OutboxClient` и вызывайте `enqueue(messageKey, payload)`:
+Инжектируйте `OutboxClient` и вызывайте `enqueue(messageType, recipient, messageKey, payload)`:
 
 ```java
-outboxClient.enqueue("order-123", "{\"event\":\"ORDER_CREATED\"}");
+outboxClient.enqueue("ORDER_CREATED", "billing", "order-123", "{\"event\":\"ORDER_CREATED\"}");
 ```
 
 ## Структура пакетов
@@ -107,6 +116,8 @@ spring:
 
 - `id` (uuid, PK): уникальный идентификатор сообщения.
 - `topic` (varchar(255)): Kafka topic, куда отправляется сообщение.
+- `message_type` (varchar(255)): тип сообщения.
+- `recipient` (varchar(255)): целевой получатель/сервис.
 - `message_key` (varchar(255), nullable): ключ сообщения в Kafka.
 - `payload` (text): полезная нагрузка.
 - `status` (varchar(32)): состояние отправки (`PENDING` или `SENT`).
@@ -122,15 +133,16 @@ spring:
 
 Минимальный контракт — один метод:
 
-- `OutboxClient.enqueue(messageKey, payload)`
+- `OutboxClient.enqueue(messageType, recipient, messageKey, payload)`
 
 Поведение:
 
 - Сохраняет запись со статусом `PENDING` в текущей транзакции.
-- `topic` берется из `outbox.topic`.
+- `topic` выбирается по `outbox.routes` по паре (`messageType`, `recipient`).
 - `messageKey` можно передавать `null` (в Kafka уйдет без ключа).
+- `messageType` и `recipient` обязательны.
 
-Паблишер `OutboxPublisher` вызывать вручную не нужно — он запускается по расписанию, если `outbox.publisher.enabled=true` и настроен `outbox.kafka.bootstrap-servers`.
+Паблишер `OutboxPublisher` вызывать вручную не нужно — он запускается по расписанию, если `outbox.publisher.enabled=true`, `outbox.kafka.enabled=true` и настроен `outbox.kafka.bootstrap-servers`.
 
 ## Corner-cases и поведение
 

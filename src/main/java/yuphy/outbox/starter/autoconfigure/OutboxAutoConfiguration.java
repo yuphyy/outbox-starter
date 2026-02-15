@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import yuphy.outbox.starter.config.OutboxProperties;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
+import yuphy.outbox.starter.service.OutboxRouteResolver;
 import yuphy.outbox.starter.service.OutboxService;
 
 @AutoConfiguration
@@ -23,9 +24,15 @@ public class OutboxAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public OutboxRouteResolver outboxRouteResolver(OutboxProperties properties) {
+        return new OutboxRouteResolver(properties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public OutboxService outboxService(OutboxMessageRepository repository,
-                                       OutboxProperties properties,
+                                       OutboxRouteResolver routeResolver,
                                        Clock clock) {
-        return new OutboxService(repository, properties, clock);
+        return new OutboxService(repository, routeResolver, clock);
     }
 }

@@ -20,6 +20,7 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @EnableScheduling
 @ConditionalOnClass(KafkaTemplate.class)
 @ConditionalOnBean(name = "outboxKafkaTemplate")
+@ConditionalOnProperty(prefix = "outbox.kafka", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnProperty(prefix = "outbox.publisher", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class OutboxPublisherAutoConfiguration {
 

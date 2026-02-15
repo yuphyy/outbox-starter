@@ -21,6 +21,7 @@ import yuphy.outbox.starter.config.OutboxKafkaProperties;
 @AutoConfiguration(after = OutboxAutoConfiguration.class)
 @EnableConfigurationProperties(OutboxKafkaProperties.class)
 @ConditionalOnClass(KafkaTemplate.class)
+@ConditionalOnProperty(prefix = "outbox.kafka", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnProperty(prefix = "outbox.kafka", name = "bootstrap-servers")
 public class OutboxKafkaAutoConfiguration {
 

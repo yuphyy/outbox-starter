@@ -14,6 +14,12 @@
             <column name="topic" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="message_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="message_key" type="varchar(255)"/>
             <column name="payload" type="text">
                 <constraints nullable="false"/>

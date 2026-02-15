@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "outbox.kafka")
 public class OutboxKafkaProperties {
 
+    private boolean enabled = true;
     private String bootstrapServers;
     private String securityProtocol = "PLAINTEXT";
     private Ssl ssl = new Ssl();

@@ -1,5 +1,7 @@
 package yuphy.outbox.starter.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,8 +11,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "outbox")
 public class OutboxProperties {
 
-    private String topic = "outbox.events";
+    private Map<String, RouteGroup> routes = new HashMap<>();
     private Publisher publisher = new Publisher();
+
+    @Getter
+    @Setter
+    public static class RouteGroup {
+        private Map<String, String> recipients = new HashMap<>();
+    }
 
     @Getter
     @Setter

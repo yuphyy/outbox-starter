@@ -29,6 +29,12 @@ public class OutboxMessage {
     @Column(nullable = false)
     private String topic;
 
+    @Column(name = "message_type", nullable = false)
+    private String messageType;
+
+    @Column(nullable = false)
+    private String recipient;
+
     @Column(name = "message_key")
     private String messageKey;
 
@@ -48,10 +54,17 @@ public class OutboxMessage {
     @Version
     private long version;
 
-    public static OutboxMessage pending(String topic, String messageKey, String payload, Clock clock) {
+    public static OutboxMessage pending(String topic,
+                                        String messageType,
+                                        String recipient,
+                                        String messageKey,
+                                        String payload,
+                                        Clock clock) {
         return new OutboxMessage(
                 UUID.randomUUID(),
                 topic,
+                messageType,
+                recipient,
                 messageKey,
                 payload,
                 OutboxMessageStatus.PENDING,
