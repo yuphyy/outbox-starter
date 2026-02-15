@@ -12,8 +12,10 @@ import jakarta.persistence.LockModeType;
 import yuphy.outbox.starter.model.OutboxMessage;
 import yuphy.outbox.starter.model.OutboxMessageStatus;
 
+/** JPA repository for outbox messages. */
 public interface OutboxMessageRepository extends JpaRepository<OutboxMessage, UUID> {
 
+    /** Fetches a batch of messages with a pessimistic write lock. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select m from OutboxMessage m where m.status = :status order by m.createdAt")
     List<OutboxMessage> findBatchForUpdate(@Param("status") OutboxMessageStatus status, Pageable pageable);

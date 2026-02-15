@@ -20,6 +20,7 @@ import yuphy.outbox.starter.config.OutboxDataSourceProperties;
 import yuphy.outbox.starter.model.OutboxMessage;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
+/** Auto-configuration for a dedicated outbox DataSource and JPA setup. */
 @AutoConfiguration(after = OutboxAutoConfiguration.class, before = OutboxJpaAutoConfiguration.class)
 @EnableConfigurationProperties(OutboxDataSourceProperties.class)
 @EntityScan(basePackageClasses = OutboxMessage.class)
@@ -32,12 +33,14 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @ConditionalOnClass({DataSource.class, LocalContainerEntityManagerFactoryBean.class})
 public class OutboxDataSourceAutoConfiguration {
 
+    /** DataSource used by the outbox persistence unit. */
     @Bean("outboxDataSource")
     @ConditionalOnMissingBean(name = "outboxDataSource")
     public DataSource outboxDataSource(OutboxDataSourceProperties properties) {
         return properties.initializeDataSourceBuilder().build();
     }
 
+    /** Entity manager factory for outbox entities. */
     @Bean("outboxEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean outboxEntityManagerFactory(
             EntityManagerFactoryBuilder builder,
@@ -49,6 +52,7 @@ public class OutboxDataSourceAutoConfiguration {
                 .build();
     }
 
+    /** Transaction manager for outbox operations. */
     @Bean("outboxTransactionManager")
     public PlatformTransactionManager outboxTransactionManager(
             @Qualifier("outboxEntityManagerFactory") EntityManagerFactory entityManagerFactory) {

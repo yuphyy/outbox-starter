@@ -16,6 +16,7 @@ import yuphy.outbox.starter.publisher.OutboxPublisher;
 import yuphy.outbox.starter.publisher.OutboxSender;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
+/** Auto-configuration for the outbox publisher scheduler. */
 @AutoConfiguration(after = {OutboxAutoConfiguration.class, OutboxKafkaAutoConfiguration.class})
 @EnableScheduling
 @ConditionalOnClass(KafkaTemplate.class)
@@ -24,17 +25,20 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @ConditionalOnProperty(prefix = "outbox.publisher", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class OutboxPublisherAutoConfiguration {
 
+    /** Reads pending outbox messages in batches. */
     @Bean
     public OutboxBatchReader outboxBatchReader(OutboxMessageRepository repository) {
         return new OutboxBatchReader(repository);
     }
 
+    /** Sends a single outbox message to Kafka. */
     @Bean
     public OutboxSender outboxSender(@Qualifier("outboxKafkaTemplate") KafkaTemplate<String, String> kafkaTemplate,
                                      OutboxProperties properties) {
         return new OutboxSender(kafkaTemplate, properties.getPublisher().getSendTimeoutMs());
     }
 
+    /** Scheduled publisher that marks messages as sent. */
     @Bean
     public OutboxPublisher outboxPublisher(OutboxBatchReader batchReader,
                                            OutboxSender sender,

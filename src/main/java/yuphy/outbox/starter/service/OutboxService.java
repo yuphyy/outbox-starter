@@ -8,6 +8,7 @@ import yuphy.outbox.starter.api.OutboxClient;
 import yuphy.outbox.starter.model.OutboxMessage;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
+/** Default outbox service implementation. */
 @RequiredArgsConstructor
 public class OutboxService implements OutboxClient {
 
@@ -17,6 +18,7 @@ public class OutboxService implements OutboxClient {
 
     @Transactional("outboxTransactionManager")
     @Override
+    /** Enqueues a message with required type and recipient. */
     public UUID enqueue(String messageType, String recipient, String messageKey, String payload) {
         String safeType = requireText(messageType, "messageType");
         String safeRecipient = requireText(recipient, "recipient");

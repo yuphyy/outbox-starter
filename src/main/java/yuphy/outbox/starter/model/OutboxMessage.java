@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/** Outbox message persisted in the database. */
 @Getter
 @Entity
 @Table(name = "outbox_message")
@@ -54,6 +55,7 @@ public class OutboxMessage {
     @Version
     private long version;
 
+    /** Creates a new pending outbox message. */
     public static OutboxMessage pending(String topic,
                                         String messageType,
                                         String recipient,
@@ -74,6 +76,7 @@ public class OutboxMessage {
         );
     }
 
+    /** Marks message as sent. */
     public void markSent(Clock clock) {
         this.status = OutboxMessageStatus.SENT;
         this.sentAt = Instant.now(clock);

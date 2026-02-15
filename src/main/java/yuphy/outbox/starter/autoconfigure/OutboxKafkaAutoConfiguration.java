@@ -18,6 +18,7 @@ import org.springframework.kafka.core.ProducerFactory;
 
 import yuphy.outbox.starter.config.OutboxKafkaProperties;
 
+/** Auto-configuration for the dedicated outbox Kafka producer. */
 @AutoConfiguration(after = OutboxAutoConfiguration.class)
 @EnableConfigurationProperties(OutboxKafkaProperties.class)
 @ConditionalOnClass(KafkaTemplate.class)
@@ -25,6 +26,7 @@ import yuphy.outbox.starter.config.OutboxKafkaProperties;
 @ConditionalOnProperty(prefix = "outbox.kafka", name = "bootstrap-servers")
 public class OutboxKafkaAutoConfiguration {
 
+    /** Producer factory for the outbox Kafka template. */
     @Bean("outboxKafkaProducerFactory")
     public ProducerFactory<String, String> outboxKafkaProducerFactory(OutboxKafkaProperties properties) {
         Map<String, Object> config = new HashMap<>();
@@ -35,6 +37,7 @@ public class OutboxKafkaAutoConfiguration {
         return new DefaultKafkaProducerFactory<>(config);
     }
 
+    /** Kafka template dedicated to outbox publishing. */
     @Bean("outboxKafkaTemplate")
     public KafkaTemplate<String, String> outboxKafkaTemplate(
             @Qualifier("outboxKafkaProducerFactory") ProducerFactory<String, String> producerFactory) {
