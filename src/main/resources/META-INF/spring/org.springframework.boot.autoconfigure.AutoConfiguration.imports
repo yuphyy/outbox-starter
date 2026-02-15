@@ -1,2 +1,3 @@
 yuphy.outbox.starter.autoconfigure.OutboxAutoConfiguration
+yuphy.outbox.starter.autoconfigure.OutboxKafkaAutoConfiguration
 yuphy.outbox.starter.autoconfigure.OutboxPublisherAutoConfiguration

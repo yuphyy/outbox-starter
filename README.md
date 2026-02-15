@@ -10,7 +10,7 @@
 
 В стартере нет собственного `application.yaml`. Конфигурация задается в приложении, которое его подключает.
 
-### База данных
+### База данных (PostgreSQL)
 
 ```yaml
 spring:
@@ -24,15 +24,32 @@ spring:
     open-in-view: false
 ```
 
-### Kafka
+### Kafka (outbox, plaintext, локально)
 
 ```yaml
-spring:
+outbox:
   kafka:
     bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    security-protocol: PLAINTEXT
+```
+
+Outbox использует собственный набор настроек `outbox.kafka.*` и не конфликтует с `spring.kafka.*` вашего сервиса.
+
+### Kafka (outbox, SSL с keystore/truststore)
+
+```yaml
+outbox:
+  kafka:
+    bootstrap-servers: kafka.prod:9093
+    security-protocol: SSL
+    ssl:
+      truststore-location: /etc/ssl/kafka.truststore.jks
+      truststore-password: changeit
+      truststore-type: JKS
+      keystore-location: /etc/ssl/kafka.keystore.p12
+      keystore-password: changeit
+      keystore-type: PKCS12
+      key-password: changeit
 ```
 
 ### Outbox-настройки
@@ -62,7 +79,7 @@ outboxClient.enqueue("order-123", "{\"event\":\"ORDER_CREATED\"}");
 - `model`: сущности и статус (`OutboxMessage`, `OutboxMessageStatus`).
 - `repository`: JPA-репозиторий.
 - `publisher`: выборка и отправка (`OutboxBatchReader`, `OutboxSender`, `OutboxPublisher`).
-- `config`: свойства (`OutboxProperties`).
+- `config`: свойства (`OutboxProperties`, `OutboxKafkaProperties`).
 - `autoconfigure`: автоконфигурация Spring Boot.
 
 ## Миграции БД (Liquibase)
@@ -88,8 +105,8 @@ spring:
 - `message_key` (varchar(255), nullable): ключ сообщения в Kafka.
 - `payload` (text): полезная нагрузка.
 - `status` (varchar(32)): состояние отправки (`PENDING` или `SENT`).
-- `created_at` (timestamp): время создания записи.
-- `sent_at` (timestamp, nullable): время успешной отправки.
+- `created_at` (timestamp with time zone): время создания записи.
+- `sent_at` (timestamp with time zone, nullable): время успешной отправки.
 - `version` (bigint): оптимистическая версия для JPA.
 
 Индекс:
@@ -108,7 +125,7 @@ spring:
 - `topic` берется из `outbox.topic`.
 - `messageKey` можно передавать `null` (в Kafka уйдет без ключа).
 
-Паблишер `OutboxPublisher` вызывать вручную не нужно — он запускается по расписанию, если `outbox.publisher.enabled=true` и в контексте есть `KafkaTemplate`.
+Паблишер `OutboxPublisher` вызывать вручную не нужно — он запускается по расписанию, если `outbox.publisher.enabled=true` и настроен `outbox.kafka.bootstrap-servers`.
 
 ## Corner-cases и поведение
 
