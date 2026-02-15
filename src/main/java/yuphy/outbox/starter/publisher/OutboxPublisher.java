@@ -9,7 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import yuphy.outbox.starter.config.OutboxProperties;
 import yuphy.outbox.starter.model.OutboxMessage;
 
-/** Scheduled publisher that sends pending outbox messages to Kafka. */
+/**
+ * EN: Scheduled publisher that sends pending outbox messages to Kafka.
+ * RU: Планировщик, отправляющий ожидающие outbox-сообщения в Kafka.
+ */
 @RequiredArgsConstructor
 public class OutboxPublisher {
 
@@ -20,7 +23,10 @@ public class OutboxPublisher {
 
     @Scheduled(fixedDelayString = "${outbox.publisher.poll-interval-ms:1000}")
     @Transactional("outboxTransactionManager")
-    /** Sends a batch of pending messages and marks them as sent. */
+    /**
+     * EN: Sends a batch of pending messages and marks them as sent.
+     * RU: Отправляет батч сообщений и помечает их как SENT.
+     */
     public void publishPending() {
         List<OutboxMessage> batch = batchReader.loadPending(properties.getPublisher().getBatchSize());
 

@@ -18,7 +18,10 @@ import org.springframework.kafka.core.ProducerFactory;
 
 import yuphy.outbox.starter.config.OutboxKafkaProperties;
 
-/** Auto-configuration for the dedicated outbox Kafka producer. */
+/**
+ * EN: Auto-configuration for the dedicated outbox Kafka producer.
+ * RU: Автоконфигурация выделенного Kafka-продюсера для outbox.
+ */
 @AutoConfiguration(after = OutboxAutoConfiguration.class)
 @EnableConfigurationProperties(OutboxKafkaProperties.class)
 @ConditionalOnClass(KafkaTemplate.class)
@@ -26,7 +29,13 @@ import yuphy.outbox.starter.config.OutboxKafkaProperties;
 @ConditionalOnProperty(prefix = "outbox.kafka", name = "bootstrap-servers")
 public class OutboxKafkaAutoConfiguration {
 
-    /** Producer factory for the outbox Kafka template. */
+    /**
+     * EN: Producer factory for the outbox Kafka template.
+     * RU: Фабрика продюсера для Kafka шаблона outbox.
+     *
+     * @param properties EN: outbox Kafka properties. RU: настройки Kafka для outbox.
+     * @return EN: producer factory. RU: фабрика продюсера.
+     */
     @Bean("outboxKafkaProducerFactory")
     public ProducerFactory<String, String> outboxKafkaProducerFactory(OutboxKafkaProperties properties) {
         Map<String, Object> config = new HashMap<>();
@@ -37,13 +46,26 @@ public class OutboxKafkaAutoConfiguration {
         return new DefaultKafkaProducerFactory<>(config);
     }
 
-    /** Kafka template dedicated to outbox publishing. */
+    /**
+     * EN: Kafka template dedicated to outbox publishing.
+     * RU: Kafka шаблон, используемый для публикации outbox.
+     *
+     * @param producerFactory EN: outbox producer factory. RU: фабрика продюсера outbox.
+     * @return EN: Kafka template. RU: Kafka шаблон.
+     */
     @Bean("outboxKafkaTemplate")
     public KafkaTemplate<String, String> outboxKafkaTemplate(
             @Qualifier("outboxKafkaProducerFactory") ProducerFactory<String, String> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
+    /**
+     * EN: Applies security and SSL settings to the Kafka config.
+     * RU: Применяет настройки безопасности и SSL к Kafka конфигурации.
+     *
+     * @param config EN: Kafka config map. RU: карта настроек Kafka.
+     * @param properties EN: outbox Kafka properties. RU: настройки Kafka для outbox.
+     */
     private void applySecurity(Map<String, Object> config, OutboxKafkaProperties properties) {
         config.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, properties.getSecurityProtocol());
         OutboxKafkaProperties.Ssl ssl = properties.getSsl();

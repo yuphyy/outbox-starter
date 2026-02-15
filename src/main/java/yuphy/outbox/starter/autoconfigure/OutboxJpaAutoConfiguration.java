@@ -11,7 +11,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import yuphy.outbox.starter.model.OutboxMessage;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
-/** Auto-configuration using the application's primary DataSource for outbox. */
+/**
+ * EN: Auto-configuration using the application's primary DataSource for outbox.
+ * RU: Автоконфигурация outbox на основе основного DataSource приложения.
+ */
 @AutoConfiguration(after = OutboxDataSourceAutoConfiguration.class)
 @EntityScan(basePackageClasses = OutboxMessage.class)
 @EnableJpaRepositories(basePackageClasses = OutboxMessageRepository.class)
@@ -19,7 +22,13 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @ConditionalOnMissingBean(name = "outboxDataSource")
 public class OutboxJpaAutoConfiguration {
 
-    /** Exposes the primary transaction manager under the outbox name. */
+    /**
+     * EN: Exposes the primary transaction manager under the outbox name.
+     * RU: Публикует основной менеджер транзакций под именем outbox.
+     *
+     * @param transactionManager EN: primary transaction manager. RU: основной менеджер транзакций.
+     * @return EN: transaction manager. RU: менеджер транзакций.
+     */
     @Bean("outboxTransactionManager")
     @ConditionalOnMissingBean(name = "outboxTransactionManager")
     public PlatformTransactionManager outboxTransactionManager(PlatformTransactionManager transactionManager) {

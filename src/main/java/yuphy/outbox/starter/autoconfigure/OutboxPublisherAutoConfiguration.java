@@ -16,7 +16,10 @@ import yuphy.outbox.starter.publisher.OutboxPublisher;
 import yuphy.outbox.starter.publisher.OutboxSender;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
-/** Auto-configuration for the outbox publisher scheduler. */
+/**
+ * EN: Auto-configuration for the outbox publisher scheduler.
+ * RU: Автоконфигурация планировщика публикации outbox.
+ */
 @AutoConfiguration(after = {OutboxAutoConfiguration.class, OutboxKafkaAutoConfiguration.class})
 @EnableScheduling
 @ConditionalOnClass(KafkaTemplate.class)
@@ -25,20 +28,42 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @ConditionalOnProperty(prefix = "outbox.publisher", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class OutboxPublisherAutoConfiguration {
 
-    /** Reads pending outbox messages in batches. */
+    /**
+     * EN: Reads pending outbox messages in batches.
+     * RU: Читает ожидающие outbox-сообщения батчами.
+     *
+     * @param repository EN: outbox repository. RU: репозиторий outbox.
+     * @return EN: batch reader. RU: читатель батчей.
+     */
     @Bean
     public OutboxBatchReader outboxBatchReader(OutboxMessageRepository repository) {
         return new OutboxBatchReader(repository);
     }
 
-    /** Sends a single outbox message to Kafka. */
+    /**
+     * EN: Sends a single outbox message to Kafka.
+     * RU: Отправляет одно outbox-сообщение в Kafka.
+     *
+     * @param kafkaTemplate EN: outbox Kafka template. RU: Kafka шаблон outbox.
+     * @param properties EN: outbox properties. RU: настройки outbox.
+     * @return EN: sender. RU: отправитель.
+     */
     @Bean
     public OutboxSender outboxSender(@Qualifier("outboxKafkaTemplate") KafkaTemplate<String, String> kafkaTemplate,
                                      OutboxProperties properties) {
         return new OutboxSender(kafkaTemplate, properties.getPublisher().getSendTimeoutMs());
     }
 
-    /** Scheduled publisher that marks messages as sent. */
+    /**
+     * EN: Scheduled publisher that marks messages as sent.
+     * RU: Планировщик, публикующий сообщения и помечающий их как SENT.
+     *
+     * @param batchReader EN: batch reader. RU: читатель батчей.
+     * @param sender EN: sender. RU: отправитель.
+     * @param properties EN: outbox properties. RU: настройки outbox.
+     * @param clock EN: clock for timestamps. RU: часы для отметок времени.
+     * @return EN: publisher. RU: паблишер.
+     */
     @Bean
     public OutboxPublisher outboxPublisher(OutboxBatchReader batchReader,
                                            OutboxSender sender,

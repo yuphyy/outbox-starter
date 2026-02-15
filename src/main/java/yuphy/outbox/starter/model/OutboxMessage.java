@@ -15,7 +15,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** Outbox message persisted in the database. */
+/**
+ * EN: Outbox message persisted in the database.
+ * RU: Сообщение outbox, сохраняемое в базе данных.
+ */
 @Getter
 @Entity
 @Table(name = "outbox_message")
@@ -55,7 +58,18 @@ public class OutboxMessage {
     @Version
     private long version;
 
-    /** Creates a new pending outbox message. */
+    /**
+     * EN: Creates a new pending outbox message.
+     * RU: Создает новое сообщение со статусом PENDING.
+     *
+     * @param topic EN: Kafka topic. RU: Kafka-топик.
+     * @param messageType EN: message type. RU: тип сообщения.
+     * @param recipient EN: recipient/service name. RU: получатель/сервис.
+     * @param messageKey EN: Kafka message key (nullable). RU: ключ Kafka (может быть null).
+     * @param payload EN: payload string. RU: полезная нагрузка строкой.
+     * @param clock EN: clock for timestamps. RU: часы для отметок времени.
+     * @return EN: outbox message. RU: сообщение outbox.
+     */
     public static OutboxMessage pending(String topic,
                                         String messageType,
                                         String recipient,
@@ -76,7 +90,12 @@ public class OutboxMessage {
         );
     }
 
-    /** Marks message as sent. */
+    /**
+     * EN: Marks message as sent.
+     * RU: Помечает сообщение как SENT.
+     *
+     * @param clock EN: clock for timestamps. RU: часы для отметок времени.
+     */
     public void markSent(Clock clock) {
         this.status = OutboxMessageStatus.SENT;
         this.sentAt = Instant.now(clock);

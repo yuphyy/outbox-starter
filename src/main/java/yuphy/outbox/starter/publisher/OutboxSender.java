@@ -7,7 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import yuphy.outbox.starter.model.OutboxMessage;
 
-/** Sends a single outbox message to Kafka. */
+/**
+ * EN: Sends a single outbox message to Kafka.
+ * RU: Отправляет одно outbox-сообщение в Kafka.
+ */
 @RequiredArgsConstructor
 public class OutboxSender {
 
@@ -16,7 +19,13 @@ public class OutboxSender {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final long sendTimeoutMs;
 
-    /** Attempts to send a message and returns true on success. */
+    /**
+     * EN: Attempts to send a message and returns true on success.
+     * RU: Пытается отправить сообщение и возвращает true при успехе.
+     *
+     * @param message EN: outbox message. RU: outbox-сообщение.
+     * @return EN: true if sent. RU: true, если отправлено.
+     */
     public boolean send(OutboxMessage message) {
         try {
             kafkaTemplate

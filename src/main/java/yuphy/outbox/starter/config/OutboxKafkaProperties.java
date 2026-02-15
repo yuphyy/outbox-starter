@@ -4,7 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** Configuration properties for the outbox Kafka producer. */
+/**
+ * EN: Configuration properties for the outbox Kafka producer.
+ * RU: Настройки Kafka-продюсера для outbox.
+ */
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "outbox.kafka")
@@ -15,7 +18,10 @@ public class OutboxKafkaProperties {
     private String securityProtocol = "PLAINTEXT";
     private Ssl ssl = new Ssl();
 
-    /** SSL settings for Kafka connectivity. */
+    /**
+     * EN: SSL settings for Kafka connectivity.
+     * RU: Настройки SSL для подключения к Kafka.
+     */
     @Getter
     @Setter
     public static class Ssl {

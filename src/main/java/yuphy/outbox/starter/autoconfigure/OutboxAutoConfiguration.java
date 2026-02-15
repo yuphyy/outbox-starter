@@ -11,27 +11,49 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 import yuphy.outbox.starter.service.OutboxRouteResolver;
 import yuphy.outbox.starter.service.OutboxService;
 
-/** Core outbox auto-configuration (no Kafka). */
+/**
+ * EN: Core outbox auto-configuration (no Kafka).
+ * RU: Базовая автоконфигурация outbox (без Kafka).
+ */
 @AutoConfiguration
 @EnableConfigurationProperties(OutboxProperties.class)
 @ConditionalOnClass(name = "org.springframework.orm.jpa.JpaTransactionManager")
 public class OutboxAutoConfiguration {
 
-    /** Clock used for timestamps in outbox entities. */
+    /**
+     * EN: Clock used for timestamps in outbox entities.
+     * RU: Часы для отметок времени в outbox-сущностях.
+     *
+     * @return EN: system UTC clock. RU: системные UTC часы.
+     */
     @Bean
     @ConditionalOnMissingBean
     public Clock outboxClock() {
         return Clock.systemUTC();
     }
 
-    /** Resolves a Kafka topic by message type and recipient. */
+    /**
+     * EN: Resolves a Kafka topic by message type and recipient.
+     * RU: Выбирает Kafka-топик по типу сообщения и получателю.
+     *
+     * @param properties EN: outbox properties. RU: настройки outbox.
+     * @return EN: route resolver. RU: резолвер маршрутов.
+     */
     @Bean
     @ConditionalOnMissingBean
     public OutboxRouteResolver outboxRouteResolver(OutboxProperties properties) {
         return new OutboxRouteResolver(properties);
     }
 
-    /** Outbox service used by application code. */
+    /**
+     * EN: Outbox service used by application code.
+     * RU: Сервис outbox для использования в приложении.
+     *
+     * @param repository EN: outbox repository. RU: репозиторий outbox.
+     * @param routeResolver EN: route resolver. RU: резолвер маршрутов.
+     * @param clock EN: clock for timestamps. RU: часы для отметок времени.
+     * @return EN: outbox service. RU: сервис outbox.
+     */
     @Bean
     @ConditionalOnMissingBean
     public OutboxService outboxService(OutboxMessageRepository repository,

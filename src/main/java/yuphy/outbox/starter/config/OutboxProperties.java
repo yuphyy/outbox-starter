@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** Configuration properties for outbox routing and publisher. */
+/**
+ * EN: Configuration properties for outbox routing and publisher.
+ * RU: Настройки маршрутизации outbox и параметров паблишера.
+ */
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "outbox")
@@ -15,14 +18,20 @@ public class OutboxProperties {
     private Map<String, RouteGroup> routes = new HashMap<>();
     private Publisher publisher = new Publisher();
 
-    /** Routes grouped by message type. */
+    /**
+     * EN: Routes grouped by message type.
+     * RU: Маршруты, сгруппированные по типу сообщения.
+     */
     @Getter
     @Setter
     public static class RouteGroup {
         private Map<String, String> recipients = new HashMap<>();
     }
 
-    /** Publisher scheduling and batching settings. */
+    /**
+     * EN: Publisher scheduling and batching settings.
+     * RU: Настройки расписания и батчинга паблишера.
+     */
     @Getter
     @Setter
     public static class Publisher {

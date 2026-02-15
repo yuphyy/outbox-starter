@@ -20,7 +20,10 @@ import yuphy.outbox.starter.config.OutboxDataSourceProperties;
 import yuphy.outbox.starter.model.OutboxMessage;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 
-/** Auto-configuration for a dedicated outbox DataSource and JPA setup. */
+/**
+ * EN: Auto-configuration for a dedicated outbox DataSource and JPA setup.
+ * RU: Автоконфигурация выделенного DataSource и JPA для outbox.
+ */
 @AutoConfiguration(after = OutboxAutoConfiguration.class, before = OutboxJpaAutoConfiguration.class)
 @EnableConfigurationProperties(OutboxDataSourceProperties.class)
 @EntityScan(basePackageClasses = OutboxMessage.class)
@@ -33,14 +36,27 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @ConditionalOnClass({DataSource.class, LocalContainerEntityManagerFactoryBean.class})
 public class OutboxDataSourceAutoConfiguration {
 
-    /** DataSource used by the outbox persistence unit. */
+    /**
+     * EN: DataSource used by the outbox persistence unit.
+     * RU: DataSource для outbox persistence unit.
+     *
+     * @param properties EN: outbox datasource properties. RU: настройки outbox datasource.
+     * @return EN: data source. RU: источник данных.
+     */
     @Bean("outboxDataSource")
     @ConditionalOnMissingBean(name = "outboxDataSource")
     public DataSource outboxDataSource(OutboxDataSourceProperties properties) {
         return properties.initializeDataSourceBuilder().build();
     }
 
-    /** Entity manager factory for outbox entities. */
+    /**
+     * EN: Entity manager factory for outbox entities.
+     * RU: Фабрика EntityManager для outbox-сущностей.
+     *
+     * @param builder EN: entity manager factory builder. RU: builder фабрики EntityManager.
+     * @param dataSource EN: outbox datasource. RU: datasource outbox.
+     * @return EN: entity manager factory bean. RU: bean фабрики EntityManager.
+     */
     @Bean("outboxEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean outboxEntityManagerFactory(
             EntityManagerFactoryBuilder builder,
@@ -52,7 +68,13 @@ public class OutboxDataSourceAutoConfiguration {
                 .build();
     }
 
-    /** Transaction manager for outbox operations. */
+    /**
+     * EN: Transaction manager for outbox operations.
+     * RU: Менеджер транзакций для операций outbox.
+     *
+     * @param entityManagerFactory EN: outbox entity manager factory. RU: фабрика EntityManager outbox.
+     * @return EN: transaction manager. RU: менеджер транзакций.
+     */
     @Bean("outboxTransactionManager")
     public PlatformTransactionManager outboxTransactionManager(
             @Qualifier("outboxEntityManagerFactory") EntityManagerFactory entityManagerFactory) {

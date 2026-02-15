@@ -4,13 +4,23 @@ import lombok.RequiredArgsConstructor;
 import yuphy.outbox.starter.config.OutboxProperties;
 import yuphy.outbox.starter.config.OutboxProperties.RouteGroup;
 
-/** Resolves a Kafka topic based on message type and recipient. */
+/**
+ * EN: Resolves a Kafka topic based on message type and recipient.
+ * RU: Выбирает Kafka-топик по типу сообщения и получателю.
+ */
 @RequiredArgsConstructor
 public class OutboxRouteResolver {
 
     private final OutboxProperties properties;
 
-    /** Returns the configured topic for messageType and recipient. */
+    /**
+     * EN: Returns the configured topic for messageType and recipient.
+     * RU: Возвращает настроенный топик для messageType и recipient.
+     *
+     * @param messageType EN: message type. RU: тип сообщения.
+     * @param recipient EN: recipient/service name. RU: получатель/сервис.
+     * @return EN: Kafka topic. RU: Kafka-топик.
+     */
     public String resolveTopic(String messageType, String recipient) {
         RouteGroup group = properties.getRoutes().get(messageType);
         if (group == null || group.getRecipients() == null) {
