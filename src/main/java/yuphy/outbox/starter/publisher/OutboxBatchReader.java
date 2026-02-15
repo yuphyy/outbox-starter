@@ -11,12 +11,14 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
 @RequiredArgsConstructor
 public class OutboxBatchReader {
 
+    private static final String CREATION_DATE_FIELD_NAME = "createdAt";
+
     private final OutboxMessageRepository repository;
 
     public List<OutboxMessage> loadPending(int batchSize) {
         return repository.findBatchForUpdate(
                 OutboxMessageStatus.PENDING,
-                PageRequest.of(0, batchSize, Sort.by(Sort.Direction.ASC, "createdAt"))
+                PageRequest.of(0, batchSize, Sort.by(Sort.Direction.ASC, CREATION_DATE_FIELD_NAME))
         );
     }
 }
