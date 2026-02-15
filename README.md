@@ -49,11 +49,21 @@ outbox:
 
 ## Как пользоваться
 
-Инжектируйте `OutboxService` и вызывайте `enqueue(messageKey, payload)`:
+Инжектируйте `OutboxClient` и вызывайте `enqueue(messageKey, payload)`:
 
 ```java
-outboxService.enqueue("order-123", "{\"event\":\"ORDER_CREATED\"}");
+outboxClient.enqueue("order-123", "{\"event\":\"ORDER_CREATED\"}");
 ```
+
+## Структура пакетов
+
+- `api`: публичный контракт (`OutboxClient`).
+- `service`: запись в outbox (`OutboxService`).
+- `model`: сущности и статус (`OutboxMessage`, `OutboxMessageStatus`).
+- `repository`: JPA-репозиторий.
+- `publisher`: выборка и отправка (`OutboxBatchReader`, `OutboxSender`, `OutboxPublisher`).
+- `config`: свойства (`OutboxProperties`).
+- `autoconfigure`: автоконфигурация Spring Boot.
 
 ## Миграции БД (Liquibase)
 
@@ -90,7 +100,7 @@ spring:
 
 Минимальный контракт — один метод:
 
-- `OutboxService.enqueue(messageKey, payload)`
+- `OutboxClient.enqueue(messageKey, payload)`
 
 Поведение:
 

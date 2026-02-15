@@ -1,2 +1,2 @@
-yuphy.outbox.starter.outbox.OutboxAutoConfiguration
-yuphy.outbox.starter.outbox.OutboxPublisherAutoConfiguration
+yuphy.outbox.starter.autoconfigure.OutboxAutoConfiguration
+yuphy.outbox.starter.autoconfigure.OutboxPublisherAutoConfiguration

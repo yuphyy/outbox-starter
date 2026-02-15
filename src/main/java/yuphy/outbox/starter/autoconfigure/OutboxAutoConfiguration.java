@@ -1,4 +1,4 @@
-package yuphy.outbox.starter.outbox;
+package yuphy.outbox.starter.autoconfigure;
 
 import java.time.Clock;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -8,6 +8,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+
+import yuphy.outbox.starter.config.OutboxProperties;
+import yuphy.outbox.starter.model.OutboxMessage;
+import yuphy.outbox.starter.repository.OutboxMessageRepository;
+import yuphy.outbox.starter.service.OutboxService;
 
 @AutoConfiguration
 @EnableConfigurationProperties(OutboxProperties.class)

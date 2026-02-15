@@ -1,4 +1,4 @@
-package yuphy.outbox.starter.outbox;
+package yuphy.outbox.starter.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

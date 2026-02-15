@@ -1,4 +1,4 @@
-package yuphy.outbox.starter.outbox;
+package yuphy.outbox.starter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

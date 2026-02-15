@@ -1,4 +1,4 @@
-package yuphy.outbox.starter.outbox;
+package yuphy.outbox.starter.autoconfigure;
 
 import java.time.Clock;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -9,6 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import yuphy.outbox.starter.config.OutboxProperties;
+import yuphy.outbox.starter.publisher.OutboxBatchReader;
+import yuphy.outbox.starter.publisher.OutboxPublisher;
+import yuphy.outbox.starter.publisher.OutboxSender;
+import yuphy.outbox.starter.repository.OutboxMessageRepository;
+
 @AutoConfiguration(after = OutboxAutoConfiguration.class)
 @EnableScheduling
 @ConditionalOnClass(KafkaTemplate.class)
@@ -17,10 +23,20 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class OutboxPublisherAutoConfiguration {
 
     @Bean
-    public OutboxPublisher outboxPublisher(OutboxMessageRepository repository,
-                                           KafkaTemplate<String, String> kafkaTemplate,
+    public OutboxBatchReader outboxBatchReader(OutboxMessageRepository repository) {
+        return new OutboxBatchReader(repository);
+    }
+
+    @Bean
+    public OutboxSender outboxSender(KafkaTemplate<String, String> kafkaTemplate, OutboxProperties properties) {
+        return new OutboxSender(kafkaTemplate, properties.getPublisher().getSendTimeoutMs());
+    }
+
+    @Bean
+    public OutboxPublisher outboxPublisher(OutboxBatchReader batchReader,
+                                           OutboxSender sender,
                                            OutboxProperties properties,
                                            Clock clock) {
-        return new OutboxPublisher(repository, kafkaTemplate, properties, clock);
+        return new OutboxPublisher(batchReader, sender, properties, clock);
     }
 }

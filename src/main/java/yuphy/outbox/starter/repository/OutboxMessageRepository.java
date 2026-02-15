@@ -1,4 +1,4 @@
-package yuphy.outbox.starter.outbox;
+package yuphy.outbox.starter.repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import jakarta.persistence.LockModeType;
+import yuphy.outbox.starter.model.OutboxMessage;
+import yuphy.outbox.starter.model.OutboxMessageStatus;
 
 public interface OutboxMessageRepository extends JpaRepository<OutboxMessage, UUID> {
 

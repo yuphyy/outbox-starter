@@ -1,4 +1,4 @@
-package yuphy.outbox.starter.outbox;
+package yuphy.outbox.starter.model;
 
 public enum OutboxMessageStatus {
     PENDING,
