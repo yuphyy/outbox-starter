@@ -17,6 +17,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
 import yuphy.outbox.starter.config.OutboxKafkaProperties;
+import yuphy.outbox.starter.config.OutboxProperties;
 
 /**
  * EN: Auto-configuration for the dedicated outbox Kafka producer.
@@ -33,16 +34,23 @@ public class OutboxKafkaAutoConfiguration {
      * EN: Producer factory for the outbox Kafka template.
      * RU: Фабрика продюсера для Kafka шаблона outbox.
      *
-     * @param properties EN: outbox Kafka properties. RU: настройки Kafka для outbox.
+     * @param kafkaProperties EN: outbox Kafka properties. RU: настройки Kafka для outbox.
+     * @param outboxProperties EN: outbox properties (used to align delivery timeout). RU: настройки outbox (для выравнивания таймаута доставки).
      * @return EN: producer factory. RU: фабрика продюсера.
      */
     @Bean("outboxKafkaProducerFactory")
-    public ProducerFactory<String, String> outboxKafkaProducerFactory(OutboxKafkaProperties properties) {
+    public ProducerFactory<String, String> outboxKafkaProducerFactory(OutboxKafkaProperties kafkaProperties,
+                                                                       OutboxProperties outboxProperties) {
         Map<String, Object> config = new HashMap<>();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        applySecurity(config, properties);
+        config.put(ProducerConfig.ACKS_CONFIG, "all");
+        config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        int timeoutMs = (int) Math.min(outboxProperties.getPublisher().getSendTimeoutMs(), Integer.MAX_VALUE);
+        config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, timeoutMs);
+        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, timeoutMs);
+        applySecurity(config, kafkaProperties);
         return new DefaultKafkaProducerFactory<>(config);
     }
 
@@ -64,11 +72,11 @@ public class OutboxKafkaAutoConfiguration {
      * RU: Применяет настройки безопасности и SSL к Kafka конфигурации.
      *
      * @param config EN: Kafka config map. RU: карта настроек Kafka.
-     * @param properties EN: outbox Kafka properties. RU: настройки Kafka для outbox.
+     * @param kafkaProperties EN: outbox Kafka properties. RU: настройки Kafka для outbox.
      */
-    private void applySecurity(Map<String, Object> config, OutboxKafkaProperties properties) {
-        config.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, properties.getSecurityProtocol());
-        OutboxKafkaProperties.Ssl ssl = properties.getSsl();
+    private void applySecurity(Map<String, Object> config, OutboxKafkaProperties kafkaProperties) {
+        config.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
+        OutboxKafkaProperties.Ssl ssl = kafkaProperties.getSsl();
         if (ssl == null) {
             return;
         }

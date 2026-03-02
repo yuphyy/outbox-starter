@@ -6,11 +6,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -26,13 +25,12 @@ import yuphy.outbox.starter.repository.OutboxMessageRepository;
  */
 @AutoConfiguration(after = OutboxAutoConfiguration.class, before = OutboxJpaAutoConfiguration.class)
 @EnableConfigurationProperties(OutboxDataSourceProperties.class)
-@EntityScan(basePackageClasses = OutboxMessage.class)
 @EnableJpaRepositories(
         basePackageClasses = OutboxMessageRepository.class,
         entityManagerFactoryRef = "outboxEntityManagerFactory",
         transactionManagerRef = "outboxTransactionManager"
 )
-@Conditional(OutboxDataSourceCondition.class)
+@ConditionalOnProperty(prefix = "outbox.datasource", name = "url")
 @ConditionalOnClass({DataSource.class, LocalContainerEntityManagerFactoryBean.class})
 public class OutboxDataSourceAutoConfiguration {
 

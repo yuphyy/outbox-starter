@@ -6,7 +6,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
@@ -55,8 +54,8 @@ public class OutboxMessage {
     @Column(name = "sent_at")
     private Instant sentAt;
 
-    @Version
-    private long version;
+    @Column(name = "retry_count", nullable = false)
+    private int retryCount;
 
     /**
      * EN: Creates a new pending outbox message.
@@ -86,18 +85,23 @@ public class OutboxMessage {
                 OutboxMessageStatus.PENDING,
                 Instant.now(clock),
                 null,
-                0L
+                0
         );
     }
 
     /**
-     * EN: Marks message as sent.
-     * RU: Помечает сообщение как SENT.
-     *
-     * @param clock EN: clock for timestamps. RU: часы для отметок времени.
+     * EN: Two outbox messages are equal if they share the same id.
+     * RU: Два outbox-сообщения равны, если у них одинаковый id.
      */
-    public void markSent(Clock clock) {
-        this.status = OutboxMessageStatus.SENT;
-        this.sentAt = Instant.now(clock);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OutboxMessage other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

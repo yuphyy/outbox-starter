@@ -27,7 +27,7 @@ public class OutboxKafkaProperties {
     public static class Ssl {
         private String truststoreLocation;
         private String truststorePassword;
-        private String truststoreType = "JKS";
+        private String truststoreType = "PKCS12";
         private String keystoreLocation;
         private String keystorePassword;
         private String keystoreType = "PKCS12";

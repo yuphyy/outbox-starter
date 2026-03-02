@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import yuphy.outbox.starter.api.OutboxClient;
 import yuphy.outbox.starter.config.OutboxProperties;
 import yuphy.outbox.starter.repository.OutboxMessageRepository;
 import yuphy.outbox.starter.service.OutboxRouteResolver;
@@ -55,7 +56,7 @@ public class OutboxAutoConfiguration {
      * @return EN: outbox service. RU: сервис outbox.
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(OutboxClient.class)
     public OutboxService outboxService(OutboxMessageRepository repository,
                                        OutboxRouteResolver routeResolver,
                                        Clock clock) {

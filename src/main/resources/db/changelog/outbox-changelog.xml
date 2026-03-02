@@ -31,9 +31,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="sent_at" type="timestamp with time zone"/>
-            <column name="version" type="bigint">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
 
         <createIndex tableName="outbox_message" indexName="idx_outbox_message_status_created">
@@ -41,4 +38,13 @@
             <column name="created_at"/>
         </createIndex>
     </changeSet>
+
+    <changeSet id="outbox-message-002" author="outbox-starter">
+        <addColumn tableName="outbox_message">
+            <column name="retry_count" type="int" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

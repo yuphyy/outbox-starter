@@ -1,4 +1,4 @@
-﻿# Outbox Starter
+# Outbox Starter
 
 Минимальный starter для outbox transaction. Бизнес-код пишет событие в таблицу `outbox_message` внутри своей транзакции. Фоновый паблишер отправляет его в Kafka и переводит статус в `SENT` после успешной отправки.
 
@@ -51,14 +51,16 @@ outbox:
     bootstrap-servers: kafka.prod:9093
     security-protocol: SSL
     ssl:
-      truststore-location: /etc/ssl/kafka.truststore.jks
+      truststore-location: /etc/ssl/kafka.truststore.p12
       truststore-password: changeit
-      truststore-type: JKS
+      truststore-type: PKCS12
       keystore-location: /etc/ssl/kafka.keystore.p12
       keystore-password: changeit
       keystore-type: PKCS12
       key-password: changeit
 ```
+
+По умолчанию оба типа (`truststore-type`, `keystore-type`) равны `PKCS12`.
 
 ### Outbox-настройки
 
@@ -74,6 +76,7 @@ outbox:
     batch-size: 100
     poll-interval-ms: 1000
     send-timeout-ms: 5000
+    max-retries: 5
 ```
 
 Если маршрут для пары (`messageType`, `recipient`) не найден, `enqueue` выбросит `IllegalArgumentException`.
@@ -120,10 +123,10 @@ spring:
 - `recipient` (varchar(255)): целевой получатель/сервис.
 - `message_key` (varchar(255), nullable): ключ сообщения в Kafka.
 - `payload` (text): полезная нагрузка.
-- `status` (varchar(32)): состояние отправки (`PENDING` или `SENT`).
+- `status` (varchar(32)): состояние отправки (`PENDING`, `SENT` или `FAILED`).
 - `created_at` (timestamp with time zone): время создания записи.
 - `sent_at` (timestamp with time zone, nullable): время успешной отправки.
-- `version` (bigint): оптимистическая версия для JPA.
+- `retry_count` (int): количество неудачных попыток отправки.
 
 Индекс:
 
@@ -146,12 +149,13 @@ spring:
 
 ## Corner-cases и поведение
 
-- **Kafka недоступна/таймаут отправки**: сообщение остается `PENDING` и будет повторно обработано при следующем цикле. Ошибка логируется.
+- **Kafka недоступна/таймаут отправки**: сообщение остается `PENDING` и будет повторно обработано при следующем цикле. Ошибка логируется. После `outbox.publisher.max-retries` (по умолчанию 5) неудачных попыток сообщение переводится в статус `FAILED` и больше не обрабатывается паблишером.
 - **Транзакционность**: `enqueue()` должен вызываться внутри бизнес-транзакции, иначе outbox-запись не будет атомарной с бизнес-изменениями.
 - **Дубликаты**: возможны при повторной отправке после ошибок. Продюсер/консьюмер должны быть идемпотентны.
-- **Мульти-инстанс**: используется `PESSIMISTIC_WRITE` без `SKIP LOCKED`. При нескольких инстансах возможны ожидания. Для горизонтального скейла можно заменить запрос на `FOR UPDATE SKIP LOCKED`.
+- **Мульти-инстанс**: используется `PESSIMISTIC_WRITE` с хинтом `SKIP LOCKED` (`jakarta.persistence.lock.timeout = -2`). Конкурирующие инстансы пропускают уже заблокированные строки вместо ожидания. Требует PostgreSQL 9.5+ или MySQL 8.0+.
 - **Порядок сообщений**: выбираются по `createdAt`, но строгая глобальная упорядоченность при нескольких инстансах не гарантируется.
 - **Статус SENT**: выставляется только после успешного `kafkaTemplate.send(...).get(timeout)`.
+- **Статус FAILED**: выставляется после исчерпания `max-retries` попыток. Сообщение в `FAILED` паблишером не трогается — требует ручного вмешательства или внешнего мониторинга.
 
 ## Примечания по автоконфигурации
 

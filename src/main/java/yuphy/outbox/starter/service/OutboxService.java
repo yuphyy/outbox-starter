@@ -19,8 +19,6 @@ public class OutboxService implements OutboxClient {
     private final OutboxRouteResolver routeResolver;
     private final Clock clock;
 
-    @Transactional("outboxTransactionManager")
-    @Override
     /**
      * EN: Enqueues a message with required type and recipient.
      * RU: Сохраняет сообщение с обязательными type и recipient.
@@ -31,6 +29,8 @@ public class OutboxService implements OutboxClient {
      * @param payload EN: payload string. RU: полезная нагрузка строкой.
      * @return EN: outbox message id. RU: идентификатор сообщения outbox.
      */
+    @Transactional("outboxTransactionManager")
+    @Override
     public UUID enqueue(String messageType, String recipient, String messageKey, String payload) {
         String safeType = requireText(messageType, "messageType");
         String safeRecipient = requireText(recipient, "recipient");

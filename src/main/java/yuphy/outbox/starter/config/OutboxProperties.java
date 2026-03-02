@@ -37,7 +37,7 @@ public class OutboxProperties {
     public static class Publisher {
         private boolean enabled = true;
         private int batchSize = 100;
-        private long pollIntervalMs = 1000;
         private long sendTimeoutMs = 5000;
+        private int maxRetries = 5;
     }
 }
